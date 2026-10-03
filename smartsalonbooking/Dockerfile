@@ -11,10 +11,11 @@ RUN apt-get update \
         libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl mbstring pdo_pgsql zip \
-    && (a2dismod mpm_event || true) \
-    && (a2dismod mpm_worker || true) \
-    && (a2dismod mpm_prefork || true) \
+    && rm -f /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf \
+        /etc/apache2/mods-enabled/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.conf \
+        /etc/apache2/mods-enabled/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.conf \
     && a2enmod mpm_prefork \
+    && test "$(find /etc/apache2/mods-enabled -maxdepth 1 -name 'mpm_*.load' | wc -l)" -eq 1 \
     && a2enmod headers rewrite \
     && printf '%s\n' \
         '<VirtualHost *:8080>' \
