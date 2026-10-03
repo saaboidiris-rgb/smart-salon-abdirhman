@@ -1,4 +1,4 @@
-FROM php:8.4-apache-bookworm
+FROM php:8.4-cli-bookworm
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -11,22 +11,6 @@ RUN apt-get update \
         libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl mbstring pdo_pgsql zip \
-    && rm -f /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf \
-        /etc/apache2/mods-enabled/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.conf \
-        /etc/apache2/mods-enabled/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.conf \
-    && a2enmod mpm_prefork \
-    && test "$(find /etc/apache2/mods-enabled -maxdepth 1 -name 'mpm_*.load' | wc -l)" -eq 1 \
-    && a2enmod headers rewrite \
-    && printf '%s\n' \
-        '<VirtualHost *:8080>' \
-        '    DocumentRoot /var/www/html/public' \
-        '    <Directory /var/www/html/public>' \
-        '        AllowOverride All' \
-        '        Require all granted' \
-        '    </Directory>' \
-        '</VirtualHost>' \
-        > /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -42,5 +26,5 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
 
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/render-entrypoint"]
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
 
