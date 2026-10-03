@@ -11,7 +11,9 @@ RUN apt-get update \
         libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl mbstring pdo_pgsql zip \
-    && (a2dismod mpm_event mpm_worker || true) \
+    && (a2dismod mpm_event || true) \
+    && (a2dismod mpm_worker || true) \
+    && (a2dismod mpm_prefork || true) \
     && a2enmod mpm_prefork \
     && a2enmod headers rewrite \
     && printf '%s\n' \
