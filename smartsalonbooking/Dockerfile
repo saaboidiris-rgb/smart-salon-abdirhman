@@ -12,7 +12,7 @@ RUN apt-get update \
     && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl mbstring pdo_pgsql zip \
     && a2enmod headers rewrite \
     && printf '%s\n' \
-        '<VirtualHost *:10000>' \
+        '<VirtualHost *:8080>' \
         '    DocumentRoot /var/www/html/public' \
         '    <Directory /var/www/html/public>' \
         '        AllowOverride All' \
@@ -20,7 +20,7 @@ RUN apt-get update \
         '    </Directory>' \
         '</VirtualHost>' \
         > /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf \
+    && sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -34,6 +34,6 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod +x /usr/local/bin/render-entrypoint
 
-EXPOSE 10000
+EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/render-entrypoint"]
 CMD ["apache2-foreground"]
