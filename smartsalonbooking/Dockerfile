@@ -5,6 +5,7 @@ RUN apt-get update \
         libfreetype6-dev \
         libicu-dev \
         libjpeg62-turbo-dev \
+        liboniguruma-dev \
         libpng-dev \
         libpq-dev \
         libzip-dev \
@@ -37,3 +38,4 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/render-entrypoint"]
 CMD ["apache2-foreground"]
+
