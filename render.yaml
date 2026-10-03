@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: smart-salon-booking
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./smartsalonbooking/Dockerfile
+    dockerContext: ./smartsalonbooking
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: Smart Salon
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_TIMEZONE
+        value: Africa/Nairobi
+      - key: APP_KEY_BASE64
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smart-salon-db
+          property: connectionString
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: public
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: info
+
+databases:
+  - name: smart-salon-db
+    databaseName: smart_salon
+    user: smart_salon
+    region: frankfurt
+    plan: free
+    postgresMajorVersion: "17"
