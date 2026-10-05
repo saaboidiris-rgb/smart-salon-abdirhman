@@ -8,9 +8,11 @@ RUN apt-get update \
         libonig-dev \
         libpng-dev \
         libpq-dev \
+        libsqlite3-dev \
         libzip-dev \
+        sqlite3 \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl mbstring pdo_pgsql zip \
+    && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl mbstring pdo_pgsql pdo_sqlite zip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer

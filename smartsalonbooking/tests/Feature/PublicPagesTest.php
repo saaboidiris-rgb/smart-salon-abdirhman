@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Service;
+use App\Models\User;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
@@ -30,6 +33,17 @@ class PublicPagesTest extends TestCase
     {
         $this->get(route('login'))->assertOk();
         $this->get(route('register'))->assertOk();
+    }
+
+    public function test_demo_admin_credentials_are_seeded(): void
+    {
+        $this->seed(UserSeeder::class);
+
+        $user = User::query()->where('email', 'admin@smartsalon.test')->first();
+
+        $this->assertNotNull($user);
+        $this->assertSame(User::ROLE_ADMIN, $user->role);
+        $this->assertTrue(Hash::check('password', $user->password));
     }
 
     public function test_guest_is_redirected_away_from_customer_dashboard(): void
