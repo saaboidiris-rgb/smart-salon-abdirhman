@@ -132,9 +132,7 @@ class Appointment extends Model
         $year = now()->year;
 
         return DB::transaction(function () use ($prefix, $year) {
-            $countThisYear = static::countForYear($year);
-
-            $next = $countThisYear + 1;
+            $next = static::lastSequenceForYear($prefix, $year) + 1;
 
             return sprintf('%s-%d-%04d', $prefix, $year, $next);
         });
@@ -142,11 +140,18 @@ class Appointment extends Model
 
     /**
      * Small helper kept separate so generateBookingNumber() stays readable.
-     * Counts appointments already created this year, locking the rows so
-     * concurrent bookings don't read a stale count.
+     * Reads the highest booking number issued this year, locking that row so
+     * concurrent bookings don't read a stale value. (Locking an aggregate like
+     * COUNT(*) works on MySQL but PostgreSQL rejects it, and counting would
+     * also reuse numbers after a booking is deleted.)
      */
-    protected static function countForYear(int $year): int
+    protected static function lastSequenceForYear(string $prefix, int $year): int
     {
-        return (int) static::whereYear('created_at', $year)->lockForUpdate()->count();
+        $last = static::where('booking_number', 'like', "{$prefix}-{$year}-%")
+            ->orderByDesc('booking_number')
+            ->lockForUpdate()
+            ->value('booking_number');
+
+        return $last ? (int) substr($last, strrpos($last, '-') + 1) : 0;
     }
 }
