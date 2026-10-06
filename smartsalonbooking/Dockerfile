@@ -21,7 +21,7 @@ WORKDIR /var/www/html
 COPY . .
 COPY docker-entrypoint.sh /usr/local/bin/render-entrypoint
 
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
     && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod +x /usr/local/bin/render-entrypoint
