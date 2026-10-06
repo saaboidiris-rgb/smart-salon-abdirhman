@@ -29,8 +29,8 @@ fi
 php artisan migrate --force
 
 # Seed demo data on first boot only (free Render instances have no shell).
-if [ "${SEED_IF_EMPTY:-false}" = "true" ]; then
-    if ! php -r 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); try { exit(Illuminate\Support\Facades\DB::table("users")->exists() ? 0 : 1); } catch (Throwable $e) { exit(0); }' 2>/dev/null; then
+if [ "${SEED_IF_EMPTY:-true}" = "true" ]; then
+    if ! php -r 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); try { exit(Illuminate\Support\Facades\DB::table("services")->exists() ? 0 : 1); } catch (Throwable $e) { exit(0); }' 2>/dev/null; then
         php artisan db:seed --force
     fi
 fi
