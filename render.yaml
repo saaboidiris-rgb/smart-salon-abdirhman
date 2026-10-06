@@ -36,6 +36,8 @@ services:
         value: stderr
       - key: LOG_LEVEL
         value: info
+      - key: SEED_IF_EMPTY
+        value: "true"
 
 databases:
   - name: smart-salon-db
